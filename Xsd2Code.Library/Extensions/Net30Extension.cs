@@ -161,28 +161,20 @@ namespace Xsd2Code.Library.Extensions
             // Generate automatic properties.
             if (GeneratorContext.GeneratorParams.Language == GenerationLanguage.CSharp)
             {
-                if (GeneratorContext.GeneratorParams.PropertyParams.AutomaticProperties)
-                {
-                    bool excludeType = false;
-                        // Exclude collection type
-                        if (CollectionTypesFields.IndexOf(prop.Name) == -1)
-                        {
-                            // Get private fieldName
-                            var propReturnStatment = prop.GetStatements[0] as CodeMethodReturnStatement;
-                            if (propReturnStatment != null)
-                            {
-                                var field = propReturnStatment.Expression as CodeFieldReferenceExpression;
-                                if (field != null)
-                                {
-                                    // Check if private field don't need initialisation in ctor (defaut value).
-                                    if (this.fieldWithAssignementInCtorListField.FindIndex(p => p == field.FieldName) == -1)
-                                    {
-                                        this.autoPropertyListField.Add(member as CodeMemberProperty);
-                                    }
-                                }
-                            }
-                        }
-                }
+                if (GeneratorContext.GeneratorParams.PropertyParams.AutomaticProperties) {
+		            bool excludeType = false;
+		            // Get private fieldName
+		            var propReturnStatment = prop.GetStatements[0] as CodeMethodReturnStatement;
+		            if (propReturnStatment != null) {
+			            var field = propReturnStatment.Expression as CodeFieldReferenceExpression;
+			            if (field != null) {
+				            // Check if private field don't need initialisation in ctor (defaut value).
+				            if (this.fieldWithAssignementInCtorListField.FindIndex(p => p == field.FieldName) == -1) {
+					            this.autoPropertyListField.Add(member as CodeMemberProperty);
+				            }
+			            }
+		            }
+	            }
             }
         }
 
@@ -197,32 +189,19 @@ namespace Xsd2Code.Library.Extensions
         {
             // Get now if filed is array before base.ProcessProperty call.
             var field = (CodeMemberField)member;
-            bool isArray = field.Type.ArrayElementType != null;
 
             base.ProcessFields(member, ctor, ns, ref addedToConstructor);
 
             // Generate automatic properties.
             if (GeneratorContext.GeneratorParams.Language == GenerationLanguage.CSharp)
             {
-                if (GeneratorContext.GeneratorParams.PropertyParams.AutomaticProperties)
-                {
-                    if (!isArray)
-                    {
-                        bool finded;
-                        if (!this.IsComplexType(field.Type, ns, out finded))
-                        {
-                            if (finded)
-                            {
-                                // If this field is not assigned in ctor, add it in remove list.
-                                // with automatic property, don't need to keep private field.
-                                if (this.fieldWithAssignementInCtorListField.FindIndex(p => p == field.Name) == -1)
-                                {
-                                    this.fieldListToRemoveField.Add(field);
-                                }
-                            }
-                        }
-                    }
-                }
+	            if (GeneratorContext.GeneratorParams.PropertyParams.AutomaticProperties) {
+		            // If this field is not assigned in ctor, add it in remove list.
+		            // with automatic property, don't need to keep private field.
+		            if (this.fieldWithAssignementInCtorListField.FindIndex(p => p == field.Name) == -1) {
+			            this.fieldListToRemoveField.Add(field);
+		            }
+	            }
             }
         }
 
